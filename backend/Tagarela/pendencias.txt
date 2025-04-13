@@ -1,0 +1,4 @@
+Implementar endpoints e regras de negócio para:⁠
+⁠- Exclusão do usuário (somente pode ser excluído caso não tenha posts relacionadas);
+- Busca de todos os posts onde um usuário específico é a 'vítima';
+⁠⁠- Ranking top 5 de usuários com maior número de autorias de posts.
