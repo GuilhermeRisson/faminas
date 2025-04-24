@@ -1,10 +1,13 @@
 import { Post } from "../models/post";
-import { getUserById } from "./userService";
+import { getUserById as importedGetUserById } from "./userService";
+
+// Tipo para a função de busca de usuário
+type GetUserByIdFunction = (id: number) => { id: number; name: string } | undefined;
 
 let posts: Post[] = [
-    { id: 1, authorId:1, victimId:2, gossip: "Diz que é Flamenguista, mas acha que o Zico ainda é titular" },
-    { id: 2, authorId:2, victimId:1, gossip: "Diz que é Botafoguense, mas não existem botafoguenses" },
-    { id: 3, authorId:3, victimId:1, gossip: "Diz que é Tricolor, mas não existem tricolores com menos de 60 anos" },
+    { id: 1, authorId:1, victimId:2, gossip: "Diz que é Flamenguista, mas acha que o Zico ainda é titular", createdAt: new Date("2023-05-01T10:00:00Z") },
+    { id: 2, authorId:2, victimId:1, gossip: "Diz que é Botafoguense, mas não existem botafoguenses", createdAt: new Date("2023-05-02T14:30:00Z") },
+    { id: 3, authorId:3, victimId:1, gossip: "Diz que é Tricolor, mas não existem tricolores com menos de 60 anos", createdAt: new Date("2023-05-03T16:15:00Z") },
 ];
 
 /**
@@ -14,6 +17,7 @@ let posts: Post[] = [
  * @param {number} authorId - ID do autor do post (deve existir)
  * @param {number} victimId - ID do usuário alvo do post (deve existir e ser diferente do autor)
  * @param {string} gossip - O conteúdo do post (não pode ser vazio)
+ * @param {GetUserByIdFunction} [getUserByIdFunc] - Função opcional para buscar usuários por ID
  * 
  * @throws {Error} Lança erro quando:
  * - Autor não existe
@@ -30,17 +34,18 @@ let posts: Post[] = [
 export function createPost(
     authorId: number,
     victimId: number,
-    gossip: string
+    gossip: string,
+    getUserByIdFunc: GetUserByIdFunction = importedGetUserById
   ): Post {
 
      // Verifica se autor existe
-    const author = getUserById(authorId);
+    const author = getUserByIdFunc(authorId);
     if (!author) {
         throw new Error("Author does not exist");
     }
 
      // Verifica se alvo existe
-    const victim = getUserById(victimId);
+    const victim = getUserByIdFunc(victimId);
     if (!victim) {
         throw new Error("Victim does not exist");
     }
@@ -52,7 +57,13 @@ export function createPost(
 
      // Gera novo ID de forma segura (trata caso de array vazio)
     const newId = Math.max(...posts.map(p => p.id), 0) + 1;
-    const newPost: Post = { id: newId, victimId, authorId, gossip };
+    const newPost: Post = { 
+        id: newId, 
+        victimId, 
+        authorId, 
+        gossip, 
+        createdAt: new Date() 
+    };
     posts.push(newPost);
     return newPost;
 }

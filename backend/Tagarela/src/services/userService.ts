@@ -44,7 +44,6 @@ export function getAllUsers(): User[] {
  * @returns O usuário encontrado ou undefined se não existir
  */
 export function getUserById(id: number): User | undefined {
-  // Correção: estava usando != (diferente) quando deveria ser === (igual)
   return users.find(user => user.id === id);
 }
 

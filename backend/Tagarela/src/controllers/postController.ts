@@ -12,8 +12,8 @@ import {
  * @access Public
  * 
  * @param {Request} req - Objeto de requisição do Express
- * @param {string} req.body.authorId - ID do autor do post (obrigatório)
- * @param {string} req.body.victimId - ID da vítima/alvo do post (obrigatório)
+ * @param {number} req.body.authorId - ID do autor do post (obrigatório)
+ * @param {number} req.body.victimId - ID da vítima/alvo do post (obrigatório)
  * @param {string} req.body.gossip - Conteúdo do post/fofoca (obrigatório)
  * @param {Response} res - Objeto de resposta do Express
  * 
@@ -26,8 +26,8 @@ import {
  * @example
  * // Request body example
  * {
- *   "authorId": "123",
- *   "victimId": "456",
+ *   "authorId": 123,
+ *   "victimId": 456,
  *   "gossip": "Fulano estava vendo o jogo durante o horário de trabalho"
  * }
  */
@@ -64,9 +64,9 @@ export function createPostController(req: Request, res: Response): void {
  * // Response example
  * [
  *   {
- *     "id": "1",
- *     "authorId": "123",
- *     "victimId": "456",
+ *     "id": 1,
+ *     "authorId": 123,
+ *     "victimId": 456,
  *     "gossip": "Fulano estava...",
  *     "createdAt": "2023-01-01T00:00:00.000Z"
  *   },

@@ -3,4 +3,5 @@ export interface Post {
 	authorId: number;
 	victimId: number;
 	gossip: string;
+	createdAt: Date;
 }

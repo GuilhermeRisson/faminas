@@ -14,5 +14,5 @@ app.use(router);
 // Porta
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Tagarela server running at http://localhost:{PORT}`);
+  console.log(`Tagarela server running at http://localhost:${PORT}`);
 });
