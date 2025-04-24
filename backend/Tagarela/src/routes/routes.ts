@@ -3,11 +3,11 @@ import {
   createUserController,
   getAllUsersController,
   getUserByIdController
-} from "./controllers/userController";
+} from "../controllers/userController";
 import {
   createPostController,
   getAllPostsController
-} from "./controllers/postController";
+} from "../controllers/postController";
 
 const router = Router();
 
