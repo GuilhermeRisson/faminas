@@ -1,0 +1,222 @@
+{
+	"info": {
+		"_postman_id": "25691d16-d872-4641-8f28-eba859f36b63",
+		"name": "API Tagarela",
+		"description": "# Documentação Técnica da API Tagarela\n\n**Versão:** 1.0.0\n\n---\n\n## 1\\. Visão Geral\n\nA API Tagarela é uma aplicação backend desenvolvida para gerenciar publicações informais (fofocas) entre usuários. Construída com **Node.js** e **Express**, ela segue os princípios de **Clean Architecture** e **SOLID**, garantindo modularidade, escalabilidade e facilidade de manutenção.\n\n---\n\n## 2\\. Endpoints\n\n### 2.1. `POST /post`\n\n**Descrição:**\n\nCria uma nova publicação (fofoca) após validações de regras de negócio.\n\n**Requisição:**\n\n``` bash\nPOST /post\nContent-Type: application/json\n{\n  \"authorId\": 1,\n  \"victimId\": 2,\n  \"gossip\": \"A Maria esqueceu o café ligado hoje!\"\n}\n\n ```\n\n**Respostas:**\n\n| Status | Corpo (Exemplo) | Descrição |\n| --- | --- | --- |\n| 201 | `{ \"id\": 1, \"authorId\": 1, \"victimId\": 2, \"gossip\": \"...\", \"createdAt\": \"...\" }` | Post criado com sucesso |\n| 400 | `{ \"error\": \"Author and victim cannot be the same\" }` | Validação falhou |\n\n**Regras de Negócio:**\n\n- `authorId` e `victimId` devem existir na base de usuários.\n    \n- `authorId` **≠** `victimId` (usuário não pode postar sobre si mesmo).\n    \n- `gossip` deve ter entre **10 e 500 caracteres**.\n    \n\n---\n\n### 2.2. `GET /post`\n\n**Descrição:**\n\nLista todos os posts cadastrados no sistema.\n\n**Requisição:**\n\n``` bash\nGET /post\n\n ```\n\n**Resposta (200 OK):**\n\n``` json\n[\n  {\n    \"id\": 1,\n    \"authorId\": 1,\n    \"victimId\": 2,\n    \"gossip\": \"A Maria esqueceu o café ligado hoje!\",\n    \"createdAt\": \"2023-04-25T10:00:00Z\"\n  }\n]\n\n ```\n\n---\n\n## 3\\. Arquitetura\n\n### 3.1. Estrutura de Pastas\n\nO projeto está localizado na pasta `src` com a seguinte estrutura:\n\n``` bash\nsrc/\n├── controllers/     # Controladores dos endpoints HTTP\n│   ├── postController.ts\n│   └── userController.ts\n├── services/        # Lógica de negócios\n│   ├── postService.ts\n│   └── userService.ts\n├── models/          # Modelos de dados\n│   ├── post.ts\n│   └── user.ts\n├── routes/          # Definições de rotas\n│   └── routes.ts\n└── index.ts         # Inicialização do servidor\n\n ```\n\n---\n\n## 4\\. Controladores\n\n### 4.1. `createPostController`\n\n**Descrição:**\n\nResponsável por criar um novo post.\n\n**Exemplo de Código:**\n\n``` ts\nimport { Request, Response } from \"express\";\nimport { createPost } from \"../services/postService\";\nexport function createPostController(req: Request, res: Response): void {\n  const { authorId, victimId, gossip } = req.body;\n  if (!authorId || !victimId || !gossip) {\n    res.status(400).json({ error: \"Missing fields in request body\" });\n    return;\n  }\n  try {\n    const newPost = createPost(authorId, victimId, gossip);\n    res.status(201).json(newPost);\n  } catch (error) {\n    res.status(400).json({ error: (error as Error).message });\n  }\n}\n\n ```\n\n---\n\n### 4.2. `getAllPostsController`\n\n**Descrição:**\n\nResponsável por listar todos os posts.\n\n**Exemplo de Código:**\n\n``` ts\nimport { Request, Response } from \"express\";\nimport { getAllPosts } from \"../services/postService\";\nexport function getAllPostsController(req: Request, res: Response): void {\n  const list = getAllPosts();\n  res.status(200).json(list);\n}\n\n ```\n\n---\n\n## 5\\. Modelos de Dados\n\n### 5.1. Entidade `Post`\n\n``` ts\nexport interface Post {\n  id: number;           // Identificador único do post\n  authorId: number;     // ID do autor\n  victimId: number;     // ID da vítima\n  gossip: string;       // Conteúdo da fofoca\n  createdAt: Date;      // Data de criação\n}\n\n ```\n\n---\n\n## 6\\. Serviços\n\n### 6.1. `createPost`\n\n**Descrição:**\n\nCria um novo post após validar as regras de negócio.\n\n**Exemplo de Código:**\n\n``` ts\nimport { Post } from \"../models/post\";\nimport { getUserById } from \"./userService\";\nlet posts: Post[] = [];\nexport function createPost(authorId: number, victimId: number, gossip: string): Post {\n  const author = getUserById(authorId);\n  if (!author) throw new Error(\"Author does not exist\");\n  const victim = getUserById(victimId);\n  if (!victim) throw new Error(\"Victim does not exist\");\n  if (authorId === victimId) throw new Error(\"Author and victim cannot be the same\");\n  const newPost: Post = {\n    id: posts.length + 1,\n    authorId,\n    victimId,\n    gossip,\n    createdAt: new Date()\n  };\n  posts.push(newPost);\n  return newPost;\n}\n\n ```\n\n---\n\n### 6.2. `getAllPosts`\n\n**Descrição:**\n\nRetorna todos os posts cadastrados.\n\n**Exemplo de Código:**\n\n``` ts\nexport function getAllPosts(): Post[] {\n  return posts;\n}\n\n ```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37957154",
+		"_collection_link": "https://backend-3643.postman.co/workspace/7b543ada-6b29-4bf8-94d0-63a5eafcdb36/collection/37957154-25691d16-d872-4641-8f28-eba859f36b63?action=share&source=collection_link&creator=37957154"
+	},
+	"item": [
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "Criar Usuário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"João\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user"
+							]
+						},
+						"description": "#### **Criar Novo Usuário**\n\nEste endpoint permite a criação de um novo usuário por meio de uma requisição **POST** para o seguinte endereço:\n\n```\nPOST http://localhost:3000/user\n\n ```\n\n#### **Corpo da Requisição (Request Body)**\n\nO corpo da requisição deve estar no formato **raw** e conter um objeto **JSON** com a seguinte propriedade:\n\n- `name` (string, obrigatório): Nome do usuário a ser criado.\n    \n\n#### **Exemplo de Corpo da Requisição**\n\n``` json\n{\n  \"name\": \"João Silva\"\n}\n\n ```\n\n#### **Resposta (Response)**\n\nA resposta retornará os detalhes do usuário recém-criado, incluindo informações como o ID e o nome.\n\n---"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Usuários",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user"
+							]
+						},
+						"description": "#### **Obter Detalhes do Usuário**\n\nEste endpoint permite recuperar as informações de um usuário.\n\n#### **Requisição**\n\n- **Método:** `GET`\n    \n- **Endpoint:** `http://localhost:3000/user`\n    \n\n#### **Resposta**\n\nA resposta incluirá os seguintes dados do usuário:\n\n- `id`: Identificador único do usuário.\n    \n- `name`: Nome do usuário.\n    \n- `email`: Endereço de e-mail do usuário.\n    \n- `status`: Status da conta do usuário.\n    \n\n#### **Exemplo de Resposta**\n\n``` json\n{\n    \"id\": \"123\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"active\"\n}\n\n ```\n\n---"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Usuário por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						},
+						"description": "#### **Obter Detalhes de um Usuário Específico**\n\nEste endpoint permite recuperar as informações de um usuário específico, utilizando o ID fornecido.\n\n#### **Requisição**\n\n- **Parâmetros de Caminho (Path Parameters):**\n    \n    - `id` (string): Identificador único do usuário.\n        \n\n#### **Resposta**\n\nA resposta será um objeto JSON contendo os detalhes do usuário. O esquema da resposta inclui:\n\n- `id` (string): Identificador único do usuário.\n    \n- `name` (string): Nome do usuário.\n    \n- `email` (string): Endereço de e-mail do usuário.\n    \n- `createdAt` (string, formato `date-time`): Data e hora de criação do usuário.\n    \n\n---"
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir Usuário",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						},
+						"description": "#### **Deletar Usuário por ID**\n\nEste endpoint é utilizado para remover um usuário com base em seu identificador único.\n\n#### **Requisição**\n\n- **Método:** `DELETE`\n    \n- **Endpoint:** `http://localhost:3000/user/:id`\n    \n- **Corpo da Requisição:** Não é necessário enviar um corpo na requisição.\n    \n\n#### **Resposta**\n\nA resposta será um objeto JSON contendo:\n\n- `message` (string): Mensagem informando o resultado da operação de exclusão.\n    \n\n#### **Exemplo de Resposta**\n\n``` json\n{\n    \"message\": \"Usuário com ID :id foi deletado\"\n}\n\n ```\n\n---"
+					},
+					"response": []
+				},
+				{
+					"name": "Posts onde o Usuário é Vítima",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user/:id/victim-posts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								":id",
+								"victim-posts"
+							],
+							"variable": [
+								{
+									"key": "id"
+								}
+							]
+						},
+						"description": "#### **Obter Publicações de Vítimas de um Usuário**\n\nEste endpoint retorna as publicações de vítimas associadas a um usuário específico, identificado por seu ID.\n\n#### **Requisição**\n\n- **Parâmetros de Caminho (Path Parameters):**\n    \n    - `id` (string, obrigatório): Identificador único do usuário.\n        \n\n#### **Resposta**\n\nA resposta será um objeto JSON contendo:\n\n- `victimPosts` (array): Lista de publicações de vítimas vinculadas ao usuário.\n    \n\n#### **Exemplo de Resposta**\n\n``` json\n{\n    \"victimPosts\": [\n        {\n            \"id\": \"123\",\n            \"title\": \"Post Title 1\",\n            \"description\": \"Post Description 1\"\n        },\n        {\n            \"id\": \"456\",\n            \"title\": \"Post Title 2\",\n            \"description\": \"Post Description 2\"\n        }\n    ]\n}\n\n ```\n\n---"
+					},
+					"response": []
+				},
+				{
+					"name": "Top 5 Autores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user/top-authors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"top-authors"
+							]
+						},
+						"description": "#### **Obter Autores em Destaque**\n\nEste endpoint retorna os principais autores cadastrados no banco de dados de usuários.\n\n#### **Requisição**\n\n- **Método:** `GET`\n    \n- **Corpo da Requisição:** Nenhum corpo é necessário.\n    \n\n#### **Resposta**\n\nA resposta será um objeto JSON contendo:\n\n- `authors` (array): Lista de autores em destaque, com as seguintes informações:\n    \n    - `id` (number): Identificador único do autor.\n        \n    - `name` (string): Nome do autor.\n        \n    - `email` (string): Endereço de e-mail do autor.\n        \n    - `posts` (number): Quantidade de publicações feitas pelo autor.\n        \n\n#### **Exemplo de Resposta**\n\n``` json\n{\n    \"authors\": [\n        {\n            \"id\": 123,\n            \"name\": \"John Doe\",\n            \"email\": \"johndoe@example.com\",\n            \"posts\": 25\n        },\n        {\n            \"id\": 456,\n            \"name\": \"Jane Smith\",\n            \"email\": \"janesmith@example.com\",\n            \"posts\": 18\n        }\n    ]\n}\n\n ```\n\n---"
+					},
+					"response": []
+				}
+			],
+			"description": "A pasta `usuários` contém os arquivos relacionados ao gerenciamento de usuários na API. Ela inclui funcionalidades como criação, listagem, exclusão e consulta de usuários, além de operações específicas, como listar posts onde o usuário foi vítima e identificar os autores mais ativos."
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Criar Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"authorId\": 1,\n  \"victimId\": 2,\n  \"gossip\": \"Fulano esqueceu o café ligado hoje!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/post",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"post"
+							]
+						},
+						"description": "#### **Criar Nova Publicação**\n\nEste endpoint permite que o cliente crie uma nova publicação.\n\n#### **Requisição**\n\n- **Método:** `POST`\n    \n- **Endpoint:** `/post`\n    \n\n##### **Corpo da Requisição (JSON):**\n\n- `authorId` (integer): ID do autor da publicação.\n    \n- `victimId` (integer): ID da vítima mencionada na publicação.\n    \n- `gossip` (string): Conteúdo da publicação contendo o boato.\n    \n\n#### **Resposta**\n\nA resposta retornará os detalhes da publicação recém-criada.\n\n---"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/post",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"post"
+							]
+						},
+						"description": "#### **Obter Publicação**\n\nEste endpoint realiza uma requisição **GET** para retornar as publicações do servidor.\n\n#### **Requisição**\n\n- **Método:** `GET`\n    \n- **Corpo da Requisição:** Não é necessário enviar corpo, conforme o padrão de requisições GET.\n    \n\n#### **Resposta**\n\nA resposta incluirá os detalhes da publicação, como:\n\n- Título da publicação\n    \n- Conteúdo\n    \n- Autor\n    \n- Outras informações relevantes\n    \n\n---"
+					},
+					"response": []
+				}
+			],
+			"description": "A pasta `posts` contém os arquivos responsáveis pelo gerenciamento de posts (fofocas). Ela abrange funcionalidades como criação de novos posts, listagem de todos os posts e validações de regras de negócio relacionadas aos autores e vítimas."
+		}
+	]
+}
