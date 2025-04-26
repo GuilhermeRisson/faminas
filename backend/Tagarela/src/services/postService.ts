@@ -37,6 +37,10 @@ export function createPost(
     gossip: string,
     getUserByIdFunc: GetUserByIdFunction = importedGetUserById
   ): Post {
+    // Validação do conteúdo do post
+    if (!gossip?.trim()) {
+        throw new Error("Post content cannot be empty");
+      }
 
      // Verifica se autor existe
     const author = getUserByIdFunc(authorId);
